@@ -1672,9 +1672,15 @@ impl InterfaceGenerator<'_> {
                 }
                 self.src.c_adapters("  }\n");
             }
-            TypeDefKind::Flags(_) => todo!(),
-            TypeDefKind::Tuple(_) => todo!(),
-            TypeDefKind::Variant(_) => todo!(),
+            TypeDefKind::Flags(_) => {
+                self.src.c_adapters("  /* TODO flags */\n");
+            }
+            TypeDefKind::Tuple(_) => {
+                self.src.c_adapters("  /* TODO tuple */\n");
+            }
+            TypeDefKind::Variant(_) => {
+                self.src.c_adapters("  /* TODO varient */\n");
+            }
             TypeDefKind::Enum(_e) => {
                 self.src.c_adapters("  /* TODO enum */\n");
             }
