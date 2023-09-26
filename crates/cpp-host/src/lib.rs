@@ -979,45 +979,48 @@ impl<'a> wit_bindgen_core::InterfaceGenerator<'a> for InterfaceGenerator<'a> {
         // self.finish_ty(id, prev);
     }
 
-    fn type_variant(&mut self, _id: TypeId, _name: &str, _variant: &Variant, _docs: &Docs) {
-        todo!();
-        // let prev = mem::take(&mut self.src.h_defs);
-        // self.src.h_defs("\n");
-        // self.docs(docs, SourceType::HDefs);
-        // self.src.h_defs("typedef struct {\n");
-        // self.src.h_defs(int_repr(variant.tag()));
-        // self.src.h_defs(" tag;\n");
-        // self.src.h_defs("union {\n");
-        // for case in variant.cases.iter() {
-        //     if let Some(ty) = get_nonempty_type(self.resolve, case.ty.as_ref()) {
-        //         self.print_ty(SourceType::HDefs, ty, None, Context::InStruct);
-        //         self.src.h_defs(" ");
-        //         self.src.h_defs(&to_c_ident(&case.name));
-        //         self.src.h_defs(";\n");
-        //     }
-        // }
-        // self.src.h_defs("} val;\n");
-        // self.src.h_defs("} ");
-        // self.print_typedef_target(id, name);
+    fn type_variant(&mut self, id: TypeId, name: &str, variant: &Variant, docs: &Docs) {
+        let prev = mem::take(&mut self.src.h_defs);
+        // let ns = self.gen.owner_namespace(self.resolve, id).to_snake_case();
+        let (ns, ns_enter, ns_leave, _owner) = self.gen.surround_with_namespace(self.resolve, id);
+        self.src.h_defs(&format!("{ns_enter}\n"));
+        self.docs(docs, SourceType::HDefs);
+        let pascal = name.to_pascal_case();
+        self.src.h_defs(&format!("typedef struct {pascal} {{\n"));
+        self.src.h_defs(int_repr(variant.tag()));
+        self.src.h_defs(" tag;\n");
+        self.src.h_defs("union {\n");
+        for case in variant.cases.iter() {
+            if let Some(ty) = get_nonempty_type(self.resolve, case.ty.as_ref()) {
+                self.print_ty(SourceType::HDefs, ty, Some(&ns), Context::InStruct);
+                self.src.h_defs(" ");
+                self.src.h_defs(&to_c_ident(&case.name));
+                self.src.h_defs(";\n");
+            }
+        }
+        self.src.h_defs("} val;\n");
+        self.src.h_defs("};\n");
+        self.src.h_defs(&format!("{ns_leave}\n"));
+       // self.print_typedef_target(id, name);
 
-        // if variant.cases.len() > 0 {
-        //     self.src.h_defs("\n");
-        // }
-        // let ns = self
-        //     .gen
-        //     .owner_namespace(self.resolve, id)
-        //     .to_shouty_snake_case();
-        // for (i, case) in variant.cases.iter().enumerate() {
-        //     self.docs(&case.docs, SourceType::HDefs);
-        //     uwriteln!(
-        //         self.src.h_defs,
-        //         "#define {ns}_{}_{} {i}",
-        //         name.to_shouty_snake_case(),
-        //         case.name.to_shouty_snake_case(),
-        //     );
-        // }
+        if variant.cases.len() > 0 {
+            self.src.h_defs("\n");
+        }
+        let ns = self
+            .gen
+            .owner_namespace(self.resolve, id)
+            .to_shouty_snake_case();
+        for (i, case) in variant.cases.iter().enumerate() {
+            self.docs(&case.docs, SourceType::HDefs);
+            uwriteln!(
+                self.src.h_defs,
+                "#define {ns}_{}_{} {i}",
+                name.to_shouty_snake_case(),
+                case.name.to_shouty_snake_case(),
+            );
+        }
 
-        // self.finish_ty(id, prev);
+        self.finish_ty(id, prev);
     }
 
     fn type_option(&mut self, _id: TypeId, _name: &str, _payload: &Type, _docs: &Docs) {
