@@ -1313,7 +1313,17 @@ impl InterfaceGenerator<'_> {
                 }
                 TypeDefKind::Flags(_) => todo!(),
                 TypeDefKind::Tuple(_) => todo!(),
-                TypeDefKind::Variant(_) => todo!(),
+                TypeDefKind::Variant(_) => {
+                    result.push((
+                        format!("{}_ptr", name.to_snake_case()),
+                        "char const*".to_string(),
+                    ));
+                    result.push((
+                        format!("{}_len", name.to_snake_case()),
+                        "uint32_t".to_string(),
+                    ));
+                    params_str.push_str("$~");
+                }
                 TypeDefKind::Enum(_e) => {
                     result.push((name.to_snake_case(), "int32_t".to_string()));
                     params_str.push_str("i");
