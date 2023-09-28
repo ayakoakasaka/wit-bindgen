@@ -1541,7 +1541,7 @@ impl InterfaceGenerator<'_> {
                     TypeDefKind::Record(_r) => result.push_str("/* TODO record 1246 */"),
                     TypeDefKind::Flags(_) => todo!(),
                     TypeDefKind::Tuple(_) => todo!(),
-                    TypeDefKind::Variant(_) => todo!(),
+                    TypeDefKind::Variant(_v) => result.push_str("/* TODO variant */"),
                     TypeDefKind::Enum(_e) => {
                         let ns = self.gen.owner_namespace(self.resolve, *id);
                         let typename = format!(
