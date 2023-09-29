@@ -1431,7 +1431,11 @@ impl InterfaceGenerator<'_> {
                 sig.wamr_types.push('*');
             }
             Type::Id(id) => match &self.resolve.types[*id].kind {
-                TypeDefKind::Record(_) => todo!(),
+                TypeDefKind::Record(_) => {
+                    sig.c_args
+                        .push((Self::RESULT_NAME.into(), "uint32_t *".into()));
+                    sig.wamr_types.push('*');
+                }
                 TypeDefKind::Flags(_) => todo!(),
                 TypeDefKind::Tuple(_) => todo!(),
                 TypeDefKind::Variant(_v) => {
