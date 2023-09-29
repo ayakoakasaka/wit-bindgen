@@ -1938,7 +1938,7 @@ impl InterfaceGenerator<'_> {
     }
 
     fn export(&mut self, _func: &Function, _interface_name: Option<&WorldKey>) {
-        todo!("function exports");
+        //todo!("function exports");
     }
 
     fn print_sig(&mut self, interface_name: Option<&WorldKey>, func: &Function) -> CSig {
