@@ -1764,6 +1764,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                     .blocks
                     .drain(self.blocks.len() - variant.cases.len()..)
                     .collect::<Vec<_>>();
+                println!("blocks: {:?}", blocks);
                 let payloads = self
                     .payloads
                     .drain(self.payloads.len() - variant.cases.len()..)
@@ -1779,6 +1780,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                     self.src.push_str(";\n");
                     variant_results.push(name);
                 }
+                println!("variant_results: {:?}", variant_results);
 
                 let expr_to_match = format!("({}).tag", operands[0]);
 
@@ -1801,7 +1803,6 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                         self.src.push_str(";\n");
                     }
                     self.src.push_str(&block);
-                    println!("Block{}", block);
 
                     for (name, result) in variant_results.iter().zip(&block_results) {
                         uwriteln!(self.src, "{} = {};", name, result);
