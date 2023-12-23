@@ -1879,11 +1879,11 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 self.let_results(result_types.len(), results);
                 let operand = &operands[0];
                 self.push_str(&format!(
-                    "if ({operand}.has_value()) {
+                    "if ({operand}.has_value()) {{
                         ({ok})
-                    } else {
+                    }} else {{
                         ({err})
-                    }"
+                    }}"
                 ));
             }
             abi::Instruction::ResultLift { result, .. } => {
