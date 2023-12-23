@@ -972,7 +972,7 @@ impl CppInterfaceGenerator<'_> {
         let namespc = namespace(self.resolve, &ty.owner);
     
         format!(
-            "{}{}",
+            "{}::{}",
             namespc.join("::"),
             ty.name.as_ref().unwrap().to_pascal_case()
         )
