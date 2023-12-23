@@ -1797,6 +1797,9 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                             operands[0],
                         );
                         self.src.push_str(".");
+                        println!("case1: {}", case.name.to_upper_camel_case());
+                        println!("case2: {}", case.name);
+                        println!("case2: {}", case.name.to_pascal_case());
                         self.src.push_str(&to_c_ident(&case.name.to_upper_camel_case()));
                         self.src.push_str(";\n");
                     }
@@ -1866,7 +1869,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 result.push_str("}");
 
                 result.push_str(")");
-                results.push(result);
+                //results.push(result);
             }
             abi::Instruction::EnumLower { .. } => results.push(format!("int32_t({})", operands[0])),
             abi::Instruction::EnumLift { ty, .. } => {
