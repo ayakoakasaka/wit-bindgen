@@ -1797,16 +1797,14 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                             operands[0],
                         );
                         self.src.push_str(".");
-                        println!("case1: {}", case.name.to_upper_camel_case());
-                        println!("case2: {}", case.name);
-                        println!("case2: {}", case.name.to_pascal_case());
-                        self.src.push_str(&to_c_ident(&case.name.to_upper_camel_case()));
+                        self.src.push_str(&to_c_ident(&case.name));
                         self.src.push_str(";\n");
                     }
                     self.src.push_str(&block);
 
                     for (name, result) in variant_results.iter().zip(&block_results) {
                         uwriteln!(self.src, "{} = {};", name, result);
+                        println!("{} = {};", name, result);
                     }
                     self.src.push_str("break;\n}\n");
                 }
