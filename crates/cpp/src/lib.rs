@@ -1738,8 +1738,8 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
             }
             abi::Instruction::FlagsLift { .. } => results.push("FlagsLift".to_string()),
             abi::Instruction::VariantPayloadName => {
-                let name = format!("payload{}", self.tmp());
-                results.push(format!("*{}", name));
+                let name = format!("result{}", self.tmp());
+                results.push(format!("{}.value()", name));
                 self.payloads.push(name);
             }
             abi::Instruction::VariantLower {
