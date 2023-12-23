@@ -1797,7 +1797,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                             operands[0],
                         );
                         self.src.push_str(".");
-                        self.src.push_str(&to_c_ident(&case.name.to_pascal_case()));
+                        self.src.push_str(&to_c_ident(&case.name.to_upper_camel_case()));
                         self.src.push_str(";\n");
                     }
                     self.src.push_str(&block);
@@ -1819,6 +1819,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 //     .drain(self.blocks.len() - variant.cases.len()..)
                 //     .collect::<Vec<_>>();
                 let op0 = &operands[0];
+                println!("op0: {}", op0);
 
                 if named_enum {
                     // In unchecked mode when this type is a named enum then we know we
