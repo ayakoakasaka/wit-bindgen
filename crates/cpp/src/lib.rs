@@ -1869,7 +1869,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 result.push_str("}");
 
                 result.push_str(")");
-                //results.push(result);
+                results.push(result);
             }
             abi::Instruction::EnumLower { .. } => results.push(format!("int32_t({})", operands[0])),
             abi::Instruction::EnumLift { ty, .. } => {
