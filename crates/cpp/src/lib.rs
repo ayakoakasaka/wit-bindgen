@@ -1880,9 +1880,9 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 let operand = &operands[0];
                 self.push_str(&format!(
                     "if ({operand}.has_value()) {{
-                        ({ok})
+                        {ok}
                     }} else {{
-                        ({err})
+                        {err}
                     }}"
                 ));
             }
