@@ -1680,7 +1680,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
             abi::Instruction::RecordLower { record, .. } => {
                 let op = &operands[0];
                 for f in record.fields.iter() {
-                    results.push(format!("({}).{}", op, to_c_ident(&(f.name.to_upper_camel_case()))));
+                    results.push(format!("({}).{}", op, to_c_ident(&f.name.to_pascal_case())));
                 }
             }
             abi::Instruction::RecordLift { record, ty, .. } => {
