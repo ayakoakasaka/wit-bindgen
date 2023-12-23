@@ -1687,6 +1687,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 ..
             } => {
                 let op = &operands[0];
+                println!("{}",op);
                 // let namespace = namespace(self.gen.resolve, &self.gen.resolve.types[*ty].owner);
                 // let mut code = String::default();
                 // for n in namespace {
@@ -1737,8 +1738,8 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
             }
             abi::Instruction::FlagsLift { .. } => results.push("FlagsLift".to_string()),
             abi::Instruction::VariantPayloadName => {
-                let name = format!("{}.value()", &operands[0]);
-                results.push(format!("{}", name));
+                let name = format!("payload{}", self.tmp());
+                results.push(format!("*{}", name));
                 self.payloads.push(name);
             }
             abi::Instruction::VariantLower {
