@@ -1801,6 +1801,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                         self.src.push_str(";\n");
                     }
                     self.src.push_str(&block);
+                    println!("Block{}", block);
 
                     for (name, result) in variant_results.iter().zip(&block_results) {
                         uwriteln!(self.src, "{} = {};", name, result);
