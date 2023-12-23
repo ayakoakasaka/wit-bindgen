@@ -967,6 +967,17 @@ impl CppInterfaceGenerator<'_> {
         )
     }
 
+    fn absolute_type_name(&self, id: TypeId) -> String {
+        let ty = &self.resolve.types[id];
+        let namespc = namespace(self.resolve, &ty.owner);
+    
+        format!(
+            "{}{}",
+            namespc.join("::"),
+            ty.name.as_ref().unwrap().to_pascal_case()
+        )
+    }
+
     fn type_name(&mut self, ty: &Type, from_namespace: &Vec<String>) -> String {
         match ty {
             Type::Bool => "bool".into(),
@@ -986,7 +997,7 @@ impl CppInterfaceGenerator<'_> {
                 "std::string".into()
             }
             Type::Id(id) => match &self.resolve.types[*id].kind {
-                TypeDefKind::Record(_r) => self.scoped_type_name(*id, from_namespace),
+                TypeDefKind::Record(_r) => self.absolute_type_name(*id),
                 TypeDefKind::Resource => self.scoped_type_name(*id, from_namespace),
                 TypeDefKind::Handle(Handle::Own(id)) => {
                     self.type_name(&Type::Id(*id), from_namespace)
@@ -1687,7 +1698,6 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 ..
             } => {
                 let op = &operands[0];
-                println!("{}",op);
                 // let namespace = namespace(self.gen.resolve, &self.gen.resolve.types[*ty].owner);
                 // let mut code = String::default();
                 // for n in namespace {
@@ -1738,8 +1748,8 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
             }
             abi::Instruction::FlagsLift { .. } => results.push("FlagsLift".to_string()),
             abi::Instruction::VariantPayloadName => {
-                let name = format!("result{}", self.tmp());
-                results.push(format!("{}.value()", name));
+                let name = format!("payload{}", self.tmp());
+                results.push(format!("*{}", name));
                 self.payloads.push(name);
             }
             abi::Instruction::VariantLower {
