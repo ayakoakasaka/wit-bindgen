@@ -967,6 +967,17 @@ impl CppInterfaceGenerator<'_> {
         )
     }
 
+    fn absolute_type_name(&self, id: TypeId) -> String {
+        let ty = &self.resolve.types[id];
+        let namespc = namespace(self.resolve, &ty.owner);
+    
+        format!(
+            "{}::{}",
+            namespc.join("::"),
+            ty.name.as_ref().unwrap().to_pascal_case()
+        )
+    }
+
     fn type_name(&mut self, ty: &Type, from_namespace: &Vec<String>) -> String {
         match ty {
             Type::Bool => "bool".into(),
@@ -986,7 +997,7 @@ impl CppInterfaceGenerator<'_> {
                 "std::string".into()
             }
             Type::Id(id) => match &self.resolve.types[*id].kind {
-                TypeDefKind::Record(_r) => self.scoped_type_name(*id, from_namespace),
+                TypeDefKind::Record(_r) => self.absolute_type_name(*id),
                 TypeDefKind::Resource => self.scoped_type_name(*id, from_namespace),
                 TypeDefKind::Handle(Handle::Own(id)) => {
                     self.type_name(&Type::Id(*id), from_namespace)
@@ -1669,7 +1680,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
             abi::Instruction::RecordLower { record, .. } => {
                 let op = &operands[0];
                 for f in record.fields.iter() {
-                    results.push(format!("({}).{}", op, to_c_ident(&f.name)));
+                    results.push(format!("({}).{}", op, to_c_ident(&f.name.to_pascal_case())));
                 }
             }
             abi::Instruction::RecordLift { record, ty, .. } => {
@@ -1753,6 +1764,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                     .blocks
                     .drain(self.blocks.len() - variant.cases.len()..)
                     .collect::<Vec<_>>();
+                
                 let payloads = self
                     .payloads
                     .drain(self.payloads.len() - variant.cases.len()..)
@@ -1793,6 +1805,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
 
                     for (name, result) in variant_results.iter().zip(&block_results) {
                         uwriteln!(self.src, "{} = {};", name, result);
+                        println!("{} = {};", name, result);
                     }
                     self.src.push_str("break;\n}\n");
                 }
@@ -1800,7 +1813,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
             }
             abi::Instruction::VariantLift { variant, ty, .. } => {
                 let mut result = String::new();
-                result.push_str("{");
+                result.push_str("(");
 
                 let named_enum = variant.cases.iter().all(|c| c.ty.is_none());
                 // let blocks = self
@@ -1808,6 +1821,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 //     .drain(self.blocks.len() - variant.cases.len()..)
                 //     .collect::<Vec<_>>();
                 let op0 = &operands[0];
+                println!("op0: {}", op0);
 
                 if named_enum {
                     // In unchecked mode when this type is a named enum then we know we
@@ -1853,7 +1867,7 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 result.push_str("}");
                 result.push_str("}");
 
-                result.push_str("}");
+                result.push_str(")");
                 results.push(result);
             }
             abi::Instruction::EnumLower { .. } => results.push(format!("int32_t({})", operands[0])),
@@ -1879,9 +1893,11 @@ impl<'a, 'b> Bindgen for FunctionBindgen<'a, 'b> {
                 self.let_results(result_types.len(), results);
                 let operand = &operands[0];
                 self.push_str(&format!(
-                    "{operand}.has_value()
-                        ? ({ok})
-                        : ({err});"
+                    "if ({operand}.has_value()) {{
+                        {ok}
+                    }} else {{
+                        {err}
+                    }}"
                 ));
             }
             abi::Instruction::ResultLift { result, .. } => {
